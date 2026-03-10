@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCC Institute of Technology & Management | Greater Noida</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#c8102e;--red2:#a00d24;--red3:#e8213f;--dark:#0d0d0d;--white:#fff;--offwhite:#f7f5f2;--gray:#6b7280;--light:#fdf1f3}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:#fff;overflow-x:hidden}
+
+/* CURSOR */
+#cur{width:10px;height:10px;background:var(--red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transition:transform .08s}
+#cur2{width:38px;height:38px;border:2px solid var(--red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;transition:width .3s,height .3s;opacity:.6}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--dark);z-index:99997;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .7s}
+#loader.hide{opacity:0;pointer-events:none}
+.l-logo{font-family:'Bebas Neue',sans-serif;font-size:90px;color:var(--red);letter-spacing:6px;animation:lpulse 1s ease-in-out infinite}
+.l-bar{width:220px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.l-fill{height:100%;background:var(--red);animation:lfill 1.8s ease forwards}
+@keyframes lfill{from{width:0}to{width:100%}}
+@keyframes lpulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:76px;background:rgba(13,13,13,.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,16,46,.3);transition:box-shadow .4s}
+nav.scrolled{box-shadow:0 4px 40px rgba(0,0,0,.5)}
+.nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.logo-box{width:50px;height:50px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.logo-box img{width:44px;height:44px;object-fit:contain;filter:brightness(10)}
+.logo-box::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.3) 50%,transparent 60%);animation:sheen 3s infinite}
+@keyframes sheen{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.logo-text h1{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px;line-height:1}
+.logo-text p{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:6px;transition:all .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:4px;left:50%;right:50%;height:2px;background:var(--red);transition:all .3s;border-radius:2px}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{left:14px;right:14px}
+.nav-apply{background:var(--red)!important;color:#fff!important;font-weight:700!important;padding:9px 22px!important;border-radius:8px!important}
+.nav-apply:hover{transform:translateY(-2px)!important;box-shadow:0 8px 24px rgba(200,16,46,.5)!important}
+.nav-apply::after{display:none!important}
+
+/* HERO */
+.hero{height:100vh;min-height:700px;position:relative;display:flex;align-items:center;overflow:hidden;background:#000}
+.slides{position:absolute;inset:0}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;background-size:cover;background-position:center}
+.slide.on{opacity:1}
+.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,rgba(13,13,13,.9) 0%,rgba(13,13,13,.6) 55%,rgba(200,16,46,.12) 100%)}
+.s1{background-image:url('https://www.kccitm.edu.in/images/cr-1a.webp')}
+.s2{background-image:url('https://www.kccitm.edu.in/images/cr-2.webp')}
+.s3{background-image:url('https://www.kccitm.edu.in/images/industry-exposure-1.webp')}
+.s4{background-image:url('https://www.kccitm.edu.in/images/culture-1.webp')}
+.scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(200,16,46,.015) 2px,rgba(200,16,46,.015) 4px);pointer-events:none;z-index:1}
+.hero-corner{position:absolute;top:0;right:0;border-style:solid;border-width:0 280px 280px 0;border-color:transparent rgba(200,16,46,.15) transparent transparent;pointer-events:none;z-index:2}
+.hero-content{position:relative;z-index:10;max-width:1300px;margin:0 auto;padding:78px 80px 0}
+.h-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.4);color:rgba(255,255,255,.9);padding:7px 20px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;animation:fup .7s .3s both}
+.bdot{width:7px;height:7px;background:var(--red);border-radius:50%;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,9vw,115px);color:#fff;line-height:.9;letter-spacing:2px;margin-bottom:26px;animation:fup .7s .5s both}
+.hero h1 .r{color:var(--red);display:block}
+.hero h1 .o{-webkit-text-stroke:2px rgba(255,255,255,.25);color:transparent;display:block}
+.hero-sub{font-size:16px;color:rgba(255,255,255,.55);max-width:540px;line-height:1.75;margin-bottom:38px;animation:fup .7s .65s both}
+.hero-btns{display:flex;gap:14px;animation:fup .7s .8s both}
+.btn-red{background:var(--red);color:#fff;padding:15px 36px;border-radius:6px;font-weight:700;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .3s;box-shadow:0 8px 28px rgba(200,16,46,.45);position:relative;overflow:hidden}
+.btn-red::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.btn-red:hover::before{transform:scaleX(1)}
+.btn-red:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(200,16,46,.65)}
+.btn-ghost{border:2px solid rgba(255,255,255,.25);color:#fff;padding:15px 36px;border-radius:6px;font-weight:600;font-size:14px;text-decoration:none;transition:all .3s}
+.btn-ghost:hover{border-color:var(--red);color:var(--red);transform:translateY(-3px)}
+.slide-dots{position:absolute;bottom:110px;left:80px;z-index:10;display:flex;gap:10px}
+.sdot{width:28px;height:4px;background:rgba(255,255,255,.25);border:none;border-radius:2px;cursor:pointer;transition:all .4s}
+.sdot.on{background:var(--red);width:50px}
+.hero-bar{position:absolute;bottom:0;left:0;right:0;z-index:10;background:rgba(200,16,46,.93);backdrop-filter:blur(10px);display:flex}
+.hst{flex:1;padding:18px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.15);transition:background .3s}
+.hst:last-child{border-right:none}
+.hst:hover{background:rgba(160,13,36,.8)}
+.hst-n{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;display:block;line-height:1;transition:transform .3s}
+.hst:hover .hst-n{transform:scale(1.1)}
+.hst-l{font-size:10px;color:rgba(255,255,255,.7);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-top:2px}
+@keyframes fup{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:translateY(0)}}
+
+/* MARQUEE */
+.mq{background:var(--dark);border-top:1px solid rgba(200,16,46,.3);overflow:hidden;padding:13px 0}
+.mq-inner{display:flex;gap:65px;animation:mscroll 28s linear infinite;white-space:nowrap}
+.mq-inner:hover{animation-play-state:paused}
+@keyframes mscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.mi{color:rgba(255,255,255,.55);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:12px;flex-shrink:0}
+.mi b{color:var(--red)}
+.ms{width:4px;height:4px;background:var(--red);border-radius:50%;display:inline-block}
+
+/* SECTIONS */
+section{padding:100px 80px}
+.inner{max-width:1300px;margin:0 auto}
+.tag{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.tag::before{content:'';width:28px;height:3px;background:var(--red);display:inline-block;border-radius:2px}
+h2.title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5vw,68px);color:var(--dark);line-height:.95;letter-spacing:1px;margin-bottom:18px}
+.desc{font-size:16px;color:var(--gray);max-width:580px;line-height:1.75}
+
+/* SCROLL REVEAL */
+.sr{opacity:0;transform:translateY(50px);transition:opacity .8s,transform .8s}
+.sr.v{opacity:1;transform:translateY(0)}
+.sl{opacity:0;transform:translateX(-50px);transition:opacity .8s,transform .8s}
+.sl.v{opacity:1;transform:translateX(0)}
+.sr2{opacity:0;transform:translateX(50px);transition:opacity .8s,transform .8s}
+.sr2.v{opacity:1;transform:translateX(0)}
+.sg>*{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
+.sg.v>*:nth-child(1){opacity:1;transform:none;transition-delay:0s}
+.sg.v>*:nth-child(2){opacity:1;transform:none;transition-delay:.08s}
+.sg.v>*:nth-child(3){opacity:1;transform:none;transition-delay:.16s}
+.sg.v>*:nth-child(4){opacity:1;transform:none;transition-delay:.24s}
+.sg.v>*:nth-child(5){opacity:1;transform:none;transition-delay:.32s}
+.sg.v>*:nth-child(6){opacity:1;transform:none;transition-delay:.4s}
+
+/* ABOUT */
+.about{background:var(--offwhite)}
+.about-g{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.img-stack{position:relative;height:560px}
+.aimg{position:absolute;border-radius:12px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.aimg img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.aimg:hover img{transform:scale(1.05)}
+.ai1{width:63%;height:72%;left:0;top:0}
+.ai2{width:52%;height:50%;right:0;top:18%;border:4px solid #fff}
+.ai3{width:42%;height:34%;left:12%;bottom:0;border:4px solid #fff}
+.a-badge{position:absolute;bottom:55px;right:0;background:var(--red);color:#fff;padding:18px 24px;border-radius:12px;z-index:5;box-shadow:0 10px 40px rgba(200,16,46,.4);animation:abob 3s ease-in-out infinite;text-align:center}
+@keyframes abob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(-2deg)}}
+.a-badge .bn{font-family:'Bebas Neue',sans-serif;font-size:46px;display:block;line-height:1}
+.a-badge .bl{font-size:10px;letter-spacing:1.5px;opacity:.85;text-transform:uppercase}
+.achip{position:absolute;background:#fff;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:700;color:var(--dark);box-shadow:0 8px 28px rgba(0,0,0,.1);display:flex;align-items:center;gap:8px;animation:chip 4s ease-in-out infinite}
+.achip:nth-child(5){top:18px;right:8%}
+.achip:nth-child(6){bottom:190px;left:-8px;animation-delay:1.2s}
+@keyframes chip{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.about-list{list-style:none;margin:26px 0}
+.about-list li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:15px;color:#374151}
+.ck{width:22px;height:22px;background:rgba(200,16,46,.1);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--red);font-size:11px;font-weight:900;flex-shrink:0;margin-top:2px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.pill{background:#fff;border:2px solid rgba(200,16,46,.2);color:var(--red);padding:7px 18px;border-radius:6px;font-size:13px;font-weight:700;transition:all .3s}
+.pill:hover{background:var(--red);color:#fff;transform:translateY(-3px);box-shadow:0 8px 20px rgba(200,16,46,.3)}
+
+/* PROGRAMS */
+.prog-head{text-align:center;margin-bottom:56px}
+.prog-head .tag{justify-content:center}
+.prog-head .tag::before{display:none}
+.ptabs{display:flex;gap:8px;justify-content:center;margin-bottom:46px;flex-wrap:wrap}
+.ptab{padding:10px 26px;border-radius:6px;border:2px solid #e5e7eb;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .3s}
+.ptab.on,.ptab:hover{background:var(--red);color:#fff;border-color:var(--red);transform:translateY(-2px);box-shadow:0 8px 22px rgba(200,16,46,.3)}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.pc{background:#fff;border:1px solid #ececec;border-radius:14px;overflow:hidden;transition:all .4s;position:relative;cursor:pointer}
+.pc:hover{transform:translateY(-10px);box-shadow:0 28px 65px rgba(0,0,0,.12);border-color:transparent}
+.piw{overflow:hidden;position:relative;height:200px}
+.piw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(200,16,46,.12),transparent 60%)}
+.piw img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.pc:hover .piw img{transform:scale(1.07)}
+.parrow{position:absolute;top:14px;right:14px;width:34px;height:34px;background:rgba(255,255,255,.9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .3s;box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.pc:hover .parrow{background:var(--red);color:#fff;transform:rotate(-45deg)}
+.pbody{padding:22px}
+.pbody h3{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--dark);letter-spacing:.5px;margin-bottom:7px}
+.pbody p{font-size:13px;color:var(--gray);line-height:1.65;margin-bottom:14px}
+.ptags{display:flex;gap:7px;flex-wrap:wrap}
+.ptag{background:var(--light);color:var(--red);padding:4px 11px;border-radius:4px;font-size:11px;font-weight:700}
+
+/* LIFE AT KCC */
+.life{background:var(--dark);padding:100px 0}
+.life-head{text-align:center;padding:0 80px;margin-bottom:56px}
+.life-head .tag{justify-content:center}
+.life-head .tag::before,.life-head .tag::after{content:'';width:28px;height:3px;background:var(--red);display:inline-block;border-radius:2px}
+.grow{overflow:hidden;margin-bottom:14px}
+.gtrack{display:flex;gap:14px;animation:gscroll 22s linear infinite}
+.gtrack.rv{animation:gscrollr 26s linear infinite}
+.gtrack:hover{animation-play-state:paused}
+@keyframes gscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes gscrollr{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+.gi{flex-shrink:0;width:290px;height:195px;border-radius:10px;overflow:hidden;position:relative}
+.gi img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gi:hover img{transform:scale(1.08)}
+.gi::after{content:'';position:absolute;inset:0;background:rgba(200,16,46,0);transition:background .4s}
+.gi:hover::after{background:rgba(200,16,46,.18)}
+
+/* LEGENDS */
+.legends{background:var(--offwhite)}
+.leg-g{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.lc{background:#fff;border-radius:14px;overflow:hidden;text-align:center;padding-bottom:22px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.lc::before{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.lc:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(0,0,0,.13)}
+.lc:hover::before{transform:scaleX(1)}
+.lc img{width:100%;height:220px;object-fit:cover;object-position:top;transition:transform .5s;display:block}
+.lc:hover img{transform:scale(1.04)}
+.lc h3{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.5px;color:var(--dark);margin:14px 0 4px;padding:0 14px}
+.lc p{font-size:11px;color:var(--red);font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:0 14px}
+
+/* PLACEMENTS */
+.place{background:var(--dark);position:relative;overflow:hidden}
+.place::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(200,16,46,.14) 0%,transparent 70%);pointer-events:none}
+.place-g{display:grid;grid-template-columns:1fr 1.35fr;gap:80px;align-items:start}
+.pstats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.psc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:22px;transition:all .4s;position:relative;overflow:hidden}
+.psc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.psc:hover{background:rgba(200,16,46,.1);border-color:rgba(200,16,46,.3);transform:translateY(-5px)}
+.psc:hover::after{transform:scaleX(1)}
+.psc-n{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--red);line-height:1;display:block}
+.psc-l{font-size:11px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px;display:block}
+.lpa-box{background:var(--red);border-radius:14px;padding:36px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden}
+.lpa-box::before{content:'₹';font-family:'Bebas Neue',sans-serif;font-size:200px;color:rgba(255,255,255,.05);position:absolute;top:-30px;right:-20px;line-height:1}
+.lpa-n{font-family:'Bebas Neue',sans-serif;font-size:76px;color:#fff;line-height:1;display:block}
+.lpa-s{font-size:14px;color:rgba(255,255,255,.7);margin-top:6px}
+.rrow{overflow:hidden;margin-bottom:14px}
+.rtrack{display:flex;gap:14px;animation:rscroll 20s linear infinite}
+.rtrack.rv{animation:rscrollr 24s linear infinite}
+.rtrack:hover{animation-play-state:paused}
+@keyframes rscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes rscrollr{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+.ri{flex-shrink:0;width:116px;height:68px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;transition:all .3s;display:flex;align-items:center;justify-content:center}
+.ri img{width:100px;height:54px;object-fit:contain;filter:brightness(0) invert(.7)}
+.ri:hover{background:rgba(255,255,255,.13);transform:scale(1.06)}
+.ri:hover img{filter:brightness(0) invert(1)}
+
+/* WHY KCC */
+.why{background:var(--offwhite)}
+.why-g{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.wc{background:#fff;border-radius:14px;padding:34px 28px;position:relative;overflow:hidden;transition:all .4s;cursor:default}
+.wc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--red),var(--red2));opacity:0;transition:opacity .4s}
+.wc:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(200,16,46,.15)}
+.wc:hover::before{opacity:1}
+.wc:hover .wc-n,.wc:hover .wc-ico,.wc:hover h3,.wc:hover p{color:#fff!important}
+.wc-n{font-family:'Bebas Neue',sans-serif;font-size:76px;color:rgba(200,16,46,.07);position:absolute;top:0;right:14px;line-height:1;transition:color .4s}
+.wc-ico{font-size:36px;display:block;margin-bottom:16px;position:relative;z-index:1;transition:transform .3s}
+.wc:hover .wc-ico{transform:scale(1.15) rotate(-8deg)}
+.wc h3{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:.5px;color:var(--dark);margin-bottom:10px;position:relative;z-index:1;transition:color .4s}
+.wc p{font-size:14px;color:var(--gray);line-height:1.7;position:relative;z-index:1;transition:color .4s}
+
+/* EVENTS */
+.events-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:46px}
+.ev-g{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:18px}
+.ec{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:transform .4s,box-shadow .4s}
+.ec:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(0,0,0,.15)}
+.ec-iw{position:relative}
+.ec-iw img{width:100%;height:300px;object-fit:cover;display:block;transition:transform .6s}
+.ec:first-child .ec-iw img{height:420px}
+.ec:hover .ec-iw img{transform:scale(1.06)}
+.ec-iw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(13,13,13,.9) 0%,rgba(13,13,13,.1) 70%,transparent 100%)}
+.ec-body{position:absolute;bottom:0;left:0;right:0;padding:26px;z-index:1}
+.ec-date{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:4px 11px;border-radius:4px;margin-bottom:9px;text-transform:uppercase}
+.ec-body h3{font-family:'Bebas Neue',sans-serif;font-size:21px;color:#fff;letter-spacing:.5px;margin-bottom:5px}
+.ec-body p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.5}
+
+/* TESTIMONIALS */
+.testi{background:var(--light)}
+.testi-head{text-align:center;margin-bottom:56px}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tc{background:#fff;border-radius:14px;padding:34px;transition:all .4s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+.tc::before{content:'"';font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(200,16,46,.06);position:absolute;top:-8px;right:14px;line-height:1}
+.tc:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(200,16,46,.1)}
+.tc-stars{color:var(--red);font-size:15px;margin-bottom:14px;letter-spacing:3px}
+.tc p{font-size:14px;color:#374151;line-height:1.75;margin-bottom:22px}
+.tc-au{display:flex;align-items:center;gap:14px}
+.tav{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;flex-shrink:0}
+.tc-nm{font-weight:700;color:var(--dark);font-size:14px}
+.tc-rl{font-size:12px;color:var(--gray)}
+
+/* LOCATION */
+.loc{background:var(--dark)}
+.loc-g{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.lpts{list-style:none;display:flex;flex-direction:column;gap:14px;margin-top:32px}
+.lpts li{display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.7);font-size:15px}
+.lic{width:40px;height:40px;background:rgba(200,16,46,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.loc-img{border-radius:16px;overflow:hidden;height:400px}
+.loc-img img{width:100%;height:100%;object-fit:cover}
+
+/* CTA */
+.cta{background:var(--red);padding:80px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'KCC';font-family:'Bebas Neue',sans-serif;font-size:380px;color:rgba(255,255,255,.04);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);letter-spacing:20px;pointer-events:none}
+.cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5vw,70px);color:#fff;letter-spacing:2px;margin-bottom:14px;position:relative;z-index:1}
+.cta p{font-size:18px;color:rgba(255,255,255,.75);margin-bottom:38px;position:relative;z-index:1}
+.cta-btns{display:flex;gap:14px;justify-content:center;position:relative;z-index:1}
+.btn-wh{background:#fff;color:var(--red);padding:16px 40px;border-radius:6px;font-weight:800;font-size:15px;text-decoration:none;transition:all .3s;box-shadow:0 8px 28px rgba(0,0,0,.2)}
+.btn-wh:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.3)}
+.btn-ow{border:2px solid rgba(255,255,255,.5);color:#fff;padding:16px 40px;border-radius:6px;font-weight:700;font-size:15px;text-decoration:none;transition:all .3s}
+.btn-ow:hover{background:rgba(255,255,255,.12);border-color:#fff;transform:translateY(-3px)}
+
+/* FOOTER */
+footer{background:#080808;padding:70px 80px 36px;color:rgba(255,255,255,.45)}
+.ft-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;max-width:1300px;margin:0 auto}
+.fb-logo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.flogo-box{width:44px;height:44px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.flogo-box img{width:38px;height:38px;object-fit:contain;filter:brightness(10)}
+.fb h2{font-family:'Bebas Neue',sans-serif;font-size:19px;color:#fff;letter-spacing:2px;line-height:1}
+.fb p{font-size:13px;line-height:1.75;margin:12px 0 20px}
+.socs{display:flex;gap:9px}
+.soc{width:36px;height:36px;background:rgba(255,255,255,.07);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;transition:all .3s}
+.soc:hover{background:var(--red);transform:translateY(-3px)}
+.fc h4{color:#fff;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
+.fc a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;padding:5px 0;transition:all .3s}
+.fc a:hover{color:var(--red);transform:translateX(6px)}
+.ft-bot{max-width:1300px;margin:54px auto 0;padding-top:26px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.ft-bot a{color:var(--red);text-decoration:none}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  section{padding:80px 40px}
+  nav,.life-head,.cta,.ft-g{padding-left:40px;padding-right:40px}
+  .hero-content{padding:78px 40px 0}
+  .slide-dots{left:40px}
+  .about-g,.place-g,.loc-g{grid-template-columns:1fr}
+  .why-g,.tg{grid-template-columns:1fr 1fr}
+  .ev-g{grid-template-columns:1fr 1fr}
+  .ec:first-child{grid-column:span 2}
+  .leg-g{grid-template-columns:1fr 1fr}
+  .pgrid{grid-template-columns:1fr 1fr}
+  .ft-g{grid-template-columns:1fr 1fr;gap:40px}
+  .hero-bar{display:none}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  h2.title{font-size:40px}
+  .why-g,.tg,.pgrid{grid-template-columns:1fr}
+  .ev-g{grid-template-columns:1fr}
+  .ec:first-child{grid-column:span 1}
+  .img-stack{height:340px}
+  .cta-btns{flex-direction:column;align-items:center}
+  .ft-g{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-logo">KCC</div>
+  <div class="l-bar"><div class="l-fill"></div></div>
+  <span style="color:rgba(255,255,255,.3);font-size:11px;letter-spacing:3px;text-transform:uppercase">Loading Excellence</span>
+</div>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">
+    <div class="logo-box">
+      <img src="https://www.kccitm.edu.in/images/kcc-logo-new.webp" alt="KCC"
+        onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-family:Bebas+Neue,sans-serif;font-size:22px;color:#fff;letter-spacing:1px>KCC</span>'">
+    </div>
+    <div class="logo-text">
+      <h1>KCC INSTITUTE</h1>
+      <p>Technology &amp; Management · Greater Noida</p>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#programs">Programs</a>
+    <a href="#life">Campus Life</a>
+    <a href="#placements">Placements</a>
+    <a href="#contact" class="nav-apply">Apply Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="slides">
+    <div class="slide s1 on"></div>
+    <div class="slide s2"></div>
+    <div class="slide s3"></div>
+    <div class="slide s4"></div>
+  </div>
+  <div class="scanlines"></div>
+  <div class="hero-corner"></div>
+  <div class="hero-content">
+    <div class="h-badge"><span class="bdot"></span>AKTU Ranked #492 &nbsp;·&nbsp; IP University #274 &nbsp;·&nbsp; Admissions Open 2025–26</div>
+    <h1>
+      <span>SHAPING</span>
+      <span class="r">TOMORROW'S</span>
+      <span class="o">LEADERS</span>
+    </h1>
+    <p class="hero-sub">KCC Institute of Technology &amp; Management — Greater Noida's premier institution. 30+ years of excellence, 250+ placement partners, world-class infrastructure.</p>
+    <div class="hero-btns">
+      <a href="#programs" class="btn-red">🎓 Explore Programs</a>
+      <a href="https://admissions.kccitm.edu.in/" target="_blank" class="btn-ghost">Apply 2025–26 →</a>
+    </div>
+  </div>
+  <div class="slide-dots">
+    <button class="sdot on" onclick="goSlide(0,this)"></button>
+    <button class="sdot" onclick="goSlide(1,this)"></button>
+    <button class="sdot" onclick="goSlide(2,this)"></button>
+    <button class="sdot" onclick="goSlide(3,this)"></button>
+  </div>
+  <div class="hero-bar">
+    <div class="hst"><span class="hst-n" data-c="30">0</span><span style="font-family:'Bebas Neue';font-size:22px;color:#fff">+</span><span class="hst-l">Years of Excellence</span></div>
+    <div class="hst"><span class="hst-n" data-c="31">0</span><span style="font-family:'Bebas Neue';font-size:22px;color:#fff"> LPA</span><span class="hst-l">Highest Int'l Package</span></div>
+    <div class="hst"><span class="hst-n" data-c="250">0</span><span style="font-family:'Bebas Neue';font-size:22px;color:#fff">+</span><span class="hst-l">Recruiting Companies</span></div>
+    <div class="hst"><span class="hst-n" data-c="12000">0</span><span style="font-family:'Bebas Neue';font-size:22px;color:#fff">+</span><span class="hst-l">Scholarships Given</span></div>
+    <div class="hst"><span class="hst-n" data-c="95">0</span><span style="font-family:'Bebas Neue';font-size:22px;color:#fff">%</span><span class="hst-l">Placement Rate</span></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq">
+  <div class="mq-inner">
+    <span class="mi"><span class="ms"></span><b>AKTU B.Tech</b> Ranked #492</span>
+    <span class="mi"><span class="ms"></span><b>IP University</b> Ranked #274</span>
+    <span class="mi"><span class="ms"></span>Admissions Open <b>2025–26</b></span>
+    <span class="mi"><span class="ms"></span><b>Anugoonj 2026</b> — Annual Fest</span>
+    <span class="mi"><span class="ms"></span>Highest Package <b>31 LPA International</b></span>
+    <span class="mi"><span class="ms"></span><b>12,000+</b> Scholarships Awarded</span>
+    <span class="mi"><span class="ms"></span><b>NBA</b> Accredited Programs</span>
+    <span class="mi"><span class="ms"></span><b>250+</b> Companies Visit Every Year</span>
+    <span class="mi"><span class="ms"></span><b>AKTU B.Tech</b> Ranked #492</span>
+    <span class="mi"><span class="ms"></span><b>IP University</b> Ranked #274</span>
+    <span class="mi"><span class="ms"></span>Admissions Open <b>2025–26</b></span>
+    <span class="mi"><span class="ms"></span><b>Anugoonj 2026</b> — Annual Fest</span>
+    <span class="mi"><span class="ms"></span>Highest Package <b>31 LPA International</b></span>
+    <span class="mi"><span class="ms"></span><b>12,000+</b> Scholarships Awarded</span>
+    <span class="mi"><span class="ms"></span><b>NBA</b> Accredited Programs</span>
+    <span class="mi"><span class="ms"></span><b>250+</b> Companies Visit Every Year</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="inner about-g">
+    <div class="img-stack sl">
+      <div class="aimg ai1"><img src="https://www.kccitm.edu.in/images/cr-1a.webp" alt="KCC Campus" onerror="this.style.background='#ddd'"></div>
+      <div class="aimg ai2"><img src="https://www.kccitm.edu.in/images/industry-exposure-1.webp" alt="Industry" onerror="this.style.background='#ccc'"></div>
+      <div class="aimg ai3"><img src="https://www.kccitm.edu.in/images/eclectic-stack-1.webp" alt="Campus" onerror="this.style.background='#bbb'"></div>
+      <div class="a-badge"><span class="bn">30+</span><span class="bl">Years of Excellence</span></div>
+      <div class="achip">🏆 NBA Accredited</div>
+      <div class="achip">📍 Greater Noida NCR</div>
+    </div>
+    <div class="sr2">
+      <p class="tag">About KCC</p>
+      <h2 class="title">A LEGACY<br>OF INNOVATION</h2>
+      <p class="desc">KCC Institute of Technology &amp; Management, located in Greater Noida (Delhi NCR), is one of the most prestigious institutions offering engineering, management, law, and commerce programs through AKTU and IP University affiliations.</p>
+      <ul class="about-list">
+        <li><span class="ck">✓</span>Affiliated to AKTU (B.Tech) and Guru Gobind Singh Indraprastha University</li>
+        <li><span class="ck">✓</span>NBA Accredited programs with industry-aligned curriculum</li>
+        <li><span class="ck">✓</span>250+ placement partners including Fortune 500 companies</li>
+        <li><span class="ck">✓</span>World-class labs, library, sports complex, and hostel facilities</li>
+        <li><span class="ck">✓</span>500+ expert mentors with industry and research experience</li>
+        <li><span class="ck">✓</span>Vibrant clubs: Art Attack, Glitz, Sports Villa, Melomania &amp; more</li>
+      </ul>
+      <div class="pills">
+        <span class="pill">AKTU</span>
+        <span class="pill">IP University</span>
+        <span class="pill">NBA</span>
+        <span class="pill">NAAC</span>
+        <span class="pill">ISO 9001</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs" style="background:#fff">
+  <div class="inner">
+    <div class="prog-head sr">
+      <p class="tag">Academic Offerings</p>
+      <h2 class="title">STUDY WITH US</h2>
+      <p class="desc" style="margin:0 auto">Innovation is in our DNA — explore our pillars of knowledge.</p>
+    </div>
+    <div class="ptabs sr">
+      <button class="ptab on" onclick="filterP('all',this)">All Programs</button>
+      <button class="ptab" onclick="filterP('btech',this)">B.Tech (AKTU)</button>
+      <button class="ptab" onclick="filterP('ug',this)">UG (IP Univ.)</button>
+      <button class="ptab" onclick="filterP('pg',this)">PG Programs</button>
+    </div>
+    <div class="pgrid sg" id="pgrid">
+      <div class="pc" data-c="btech">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/ug-program-img1.webp" alt="B.Tech" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>B.Tech Programs</h3><p>CSE, AI&amp;ML, Data Science, IoT, Mechanical, Civil, ECE, EE, IT — affiliated to AKTU.</p><div class="ptags"><span class="ptag">4 Years</span><span class="ptag">AKTU</span></div></div>
+      </div>
+      <div class="pc" data-c="ug">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/ug-program-img2.webp" alt="UG ILHE" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>UG Programs (KCC ILHE)</h3><p>BBA, BCA, BA JMC, B.Com (Hons.), BA LLB, BBA LLB — IP University.</p><div class="ptags"><span class="ptag">3 Years</span><span class="ptag">IP Univ.</span></div></div>
+      </div>
+      <div class="pc" data-c="pg">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/pg-program-img1.webp" alt="MBA" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>MBA Plus</h3><p>MBA with integrated industry training, live projects, and guaranteed placement support.</p><div class="ptags"><span class="ptag">2 Years</span><span class="ptag">PG</span></div></div>
+      </div>
+      <div class="pc" data-c="btech">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/eclectic-stack-1.webp" alt="CSE AI" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>B.Tech CSE (AI &amp; ML)</h3><p>Cutting-edge AI &amp; Machine Learning specialization for tomorrow's tech leaders.</p><div class="ptags"><span class="ptag">4 Years</span><span class="ptag">AI/ML</span></div></div>
+      </div>
+      <div class="pc" data-c="pg">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/pg-program-img2.webp" alt="M.Tech" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>M.Tech Programs</h3><p>M.Tech in CSE, Mechanical, and Electronics &amp; Communication under AKTU.</p><div class="ptags"><span class="ptag">2 Years</span><span class="ptag">PG</span></div></div>
+      </div>
+      <div class="pc" data-c="ug">
+        <div class="piw"><img src="https://www.kccitm.edu.in/images/social-impact-1.webp" alt="Law" onerror="this.style.background='#eee'"></div>
+        <div class="parrow">→</div>
+        <div class="pbody"><h3>Law Programs</h3><p>Integrated 5-year BA LLB &amp; BBA LLB under IP University for aspiring lawyers.</p><div class="ptags"><span class="ptag">5 Years</span><span class="ptag">Law</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIFE AT KCC -->
+<section class="life" id="life">
+  <div class="life-head sr">
+    <p class="tag">Campus Experience</p>
+    <h2 class="title" style="color:#fff">LIFE AT KCC</h2>
+    <p class="desc" style="color:rgba(255,255,255,.45);margin:0 auto;text-align:center">Vibrant. Dynamic. Unforgettable. Discover the KCC experience.</p>
+  </div>
+  <div class="grow">
+    <div class="gtrack">
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-1a.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-1b.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-4.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-5.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-1a.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-1b.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-4.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/cr-5.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-2.webp" alt="" loading="lazy"></div>
+    </div>
+  </div>
+  <div class="grow">
+    <div class="gtrack rv">
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/eclectic-stack-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/eclectic-stack-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/industry-exposure-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/eclectic-stack-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/eclectic-stack-2.webp" alt="" loading="lazy"></div>
+    </div>
+  </div>
+  <div class="grow">
+    <div class="gtrack">
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-4.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-5.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-diversity-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-diversity-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/enterp-3.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-4.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-5.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-diversity-1.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/culture-diversity-2.webp" alt="" loading="lazy"></div>
+      <div class="gi"><img src="https://www.kccitm.edu.in/images/social-impact-3.webp" alt="" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEGENDS -->
+<section class="legends">
+  <div class="inner">
+    <div class="sr" style="text-align:center;margin-bottom:56px">
+      <p class="tag" style="justify-content:center">Distinguished Visitors</p>
+      <h2 class="title" style="text-align:center">LEGENDS WALK<br>THE HALLS</h2>
+    </div>
+    <div class="leg-g sg">
+      <div class="lc"><img src="https://www.kccitm.edu.in/images/legend-1b.webp" alt="Ankur Warikoo" onerror="this.style.background='#f5f5f5';this.style.display='block'"><h3>Ankur Warikoo</h3><p>Entrepreneur &amp; Content Creator</p></div>
+      <div class="lc"><img src="https://www.kccitm.edu.in/images/ajai_chowdhry.webp" alt="Ajai Chaudhary" onerror="this.style.background='#f5f5f5'"><h3>Shri Ajai Chaudhary</h3><p>Founder, HCL</p></div>
+      <div class="lc"><img src="https://www.kccitm.edu.in/images/smt-maneka-gandhi.webp" alt="Maneka Gandhi" onerror="this.style.background='#f5f5f5'"><h3>Smt. Maneka Gandhi</h3><p>Chairperson, People for Animals</p></div>
+      <div class="lc"><img src="https://www.kccitm.edu.in/images/legend-4.webp" alt="Smriti Irani" onerror="this.style.background='#f5f5f5'"><h3>Smt. Smriti Irani</h3><p>Former Union Minister, GOI</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLACEMENTS -->
+<section class="place" id="placements">
+  <div class="inner">
+    <div class="place-g">
+      <div class="sl">
+        <p class="tag" style="color:rgba(255,255,255,.6)">Placements 2024</p>
+        <p class="tag::before" style="background:rgba(255,255,255,.6)"></p>
+        <h2 class="title" style="color:#fff">PRODUCING<br>SKILLED<br>PROFESSIONALS</h2>
+        <p class="desc">Our CRC works relentlessly to ensure every student achieves outstanding career success.</p>
+        <div class="pstats">
+          <div class="psc"><span class="psc-n" data-c="31">0</span><span style="font-family:'Bebas Neue';color:var(--red);font-size:24px"> LPA</span><span class="psc-l">Highest Int'l Package</span></div>
+          <div class="psc"><span class="psc-n" data-c="14">0</span><span style="font-family:'Bebas Neue';color:var(--red);font-size:24px">.2 LPA</span><span class="psc-l">Highest National Package</span></div>
+          <div class="psc"><span class="psc-n" data-c="250">0</span><span style="font-family:'Bebas Neue';color:var(--red);font-size:24px">+</span><span class="psc-l">Companies Recruited</span></div>
+          <div class="psc"><span class="psc-n" data-c="12000">0</span><span style="font-family:'Bebas Neue';color:var(--red);font-size:24px">+</span><span class="psc-l">Scholarships Given</span></div>
+        </div>
+      </div>
+      <div class="sr2">
+        <div class="lpa-box">
+          <span class="lpa-n">31 LPA</span>
+          <p class="lpa-s">Highest International Package · 20 LPA+ by 2 companies · 10 LPA+ by 8+ companies</p>
+        </div>
+        <div class="rrow"><div class="rtrack">
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-1.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-2.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-3.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-4.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-5.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-6.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-7.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-1.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-2.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-3.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-4.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-5.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-6.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-7.webp" alt="" loading="lazy"></div>
+        </div></div>
+        <div class="rrow"><div class="rtrack rv">
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-8.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-9.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-10.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-11.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-12.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-13.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-14.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-8.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-9.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-10.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-11.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-12.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-13.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-14.webp" alt="" loading="lazy"></div>
+        </div></div>
+        <div class="rrow"><div class="rtrack">
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-15.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-16.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-17.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-18.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-19.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-20.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-21.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-15.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-16.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-17.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-18.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-19.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-20.webp" alt="" loading="lazy"></div>
+          <div class="ri"><img src="https://www.kccitm.edu.in/images/place-recruiter-21.webp" alt="" loading="lazy"></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY KCC -->
+<section class="why">
+  <div class="inner">
+    <div class="sr" style="text-align:center;margin-bottom:56px">
+      <p class="tag" style="justify-content:center">Why Choose KCC</p>
+      <h2 class="title" style="text-align:center">A COLLEGE THAT OFFERS<br>MORE THAN A DEGREE</h2>
+    </div>
+    <div class="why-g sg">
+      <div class="wc"><span class="wc-n">01</span><span class="wc-ico">🏛️</span><h3>WORLD-CLASS CAMPUS</h3><p>Modern labs, vast library, auditorium, sports complex and hostel in Greater Noida's knowledge hub.</p></div>
+      <div class="wc"><span class="wc-n">02</span><span class="wc-ico">🤝</span><h3>INDUSTRY CONNECTIONS</h3><p>Strong MoUs with 250+ visiting companies including TCS, Infosys, HCL, Wipro and global MNCs.</p></div>
+      <div class="wc"><span class="wc-n">03</span><span class="wc-ico">🎓</span><h3>500+ EXPERT MENTORS</h3><p>PhD holders and industry veterans delivering theory and real-world insights every day.</p></div>
+      <div class="wc"><span class="wc-n">04</span><span class="wc-ico">📈</span><h3>OUTSTANDING PLACEMENTS</h3><p>Highest package of 31 LPA internationally, dedicated CRC driving every student's career.</p></div>
+      <div class="wc"><span class="wc-n">05</span><span class="wc-ico">🔬</span><h3>CENTERS OF EXCELLENCE</h3><p>Dedicated labs in AI, Data Science, IoT, Robotics and Emerging Technologies.</p></div>
+      <div class="wc"><span class="wc-n">06</span><span class="wc-ico">🎭</span><h3>VIBRANT CAMPUS LIFE</h3><p>Anugoonj, Fuel Fest, 8+ student clubs — Art Attack, Glitz, Sports Villa, Melomania and more.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section style="background:#fff">
+  <div class="inner">
+    <div class="events-head sr">
+      <div>
+        <p class="tag">Campus Events</p>
+        <h2 class="title">LIFE IN MOTION</h2>
+      </div>
+      <a href="https://www.kccitm.edu.in/news-and-announcements/events" target="_blank" class="btn-red" style="padding:12px 24px;font-size:13px">View All →</a>
+    </div>
+    <div class="ev-g sg">
+      <div class="ec">
+        <div class="ec-iw"><img src="https://www.kccitm.edu.in/images/culture-diversity-1.webp" alt="Anugoonj" loading="lazy" onerror="this.src='https://www.kccitm.edu.in/images/cr-1a.webp'"></div>
+        <div class="ec-body"><span class="ec-date">📅 March 2026</span><h3>ANUGOONJ 2026 — ANNUAL FEST</h3><p>KCC's biggest annual celebration — music, dance, drama, celebrity performances!</p></div>
+      </div>
+      <div class="ec">
+        <div class="ec-iw"><img src="https://www.kccitm.edu.in/images/industry-exposure-4.webp" alt="Tech" loading="lazy" onerror="this.src='https://www.kccitm.edu.in/images/cr-2.webp'"></div>
+        <div class="ec-body"><span class="ec-date">📅 Ongoing</span><h3>TECH SYMPOSIUM</h3><p>Hackathons, paper presentations &amp; expert talks.</p></div>
+      </div>
+      <div class="ec">
+        <div class="ec-iw"><img src="https://www.kccitm.edu.in/images/enterp-4.webp" alt="Orientation" loading="lazy" onerror="this.src='https://www.kccitm.edu.in/images/cr-3.webp'"></div>
+        <div class="ec-body"><span class="ec-date">📅 July 2025</span><h3>ORIENTATION 2025</h3><p>Welcome new batch with campus tours and industry mentors.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi">
+  <div class="inner">
+    <div class="testi-head sr">
+      <p class="tag" style="justify-content:center">Student Voices</p>
+      <h2 class="title" style="text-align:center">WHAT OUR STUDENTS SAY</h2>
+    </div>
+    <div class="tg sg">
+      <div class="tc"><div class="tc-stars">★★★★★</div><p>"KCC gave me the foundation to land a role at a top MNC. Faculty mentorship, CRC support, and placement training are world-class. Proud to be a KCCian!"</p><div class="tc-au"><div class="tav">R</div><div><p class="tc-nm">Rahul Sharma</p><p class="tc-rl">B.Tech CSE · Placed at TCS — 7.5 LPA</p></div></div></div>
+      <div class="tc"><div class="tc-stars">★★★★★</div><p>"The BBA program at KCC ILHE is outstanding. IP University affiliation, experienced professors, and industry exposure helped me build real business skills."</p><div class="tc-au"><div class="tav">P</div><div><p class="tc-nm">Priya Gupta</p><p class="tc-rl">BBA Graduate · KCC ILHE</p></div></div></div>
+      <div class="tc"><div class="tc-stars">★★★★★</div><p>"Best decision of my life! The labs, clubs, fests and placement drives exceeded all expectations. Got placed at Infosys with an amazing package!"</p><div class="tc-au"><div class="tav">A</div><div><p class="tc-nm">Ankit Verma</p><p class="tc-rl">B.Tech ECE · Placed at Infosys — 6.5 LPA</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="loc">
+  <div class="inner loc-g">
+    <div class="sl">
+      <p class="tag" style="color:rgba(255,255,255,.5)">Location &amp; Advantage</p>
+      <h2 class="title" style="color:#fff">LOCATED AT<br>GREATER NOIDA</h2>
+      <p class="desc" style="color:rgba(255,255,255,.45)">Strategically positioned in Delhi NCR's knowledge hub — minutes from metro, expressway, and MNC zones.</p>
+      <ul class="lpts">
+        <li><div class="lic">🚇</div><span><strong style="color:#fff">10 Mins</strong> walk from Knowledge Park II Metro Station</span></li>
+        <li><div class="lic">🏢</div><span>Surrounded by <strong style="color:#fff">Enterprises and MNCs</strong></span></li>
+        <li><div class="lic">🛣️</div><span><strong style="color:#fff">2 Mins</strong> from Noida–Greater Noida Expressway</span></li>
+        <li><div class="lic">✈️</div><span><strong style="color:#fff">30 Mins</strong> away from Jewar International Airport</span></li>
+      </ul>
+    </div>
+    <div class="loc-img sr2"><img src="https://www.kccitm.edu.in/images/location-way.webp" alt="KCC Location" onerror="this.style.background='#1a1a1a'"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta" id="contact">
+  <h2>READY TO BEGIN YOUR JOURNEY?</h2>
+  <p>Admissions open for 2025–26. Secure your seat at KCC today.</p>
+  <div class="cta-btns">
+    <a href="https://admissions.kccitm.edu.in/" target="_blank" class="btn-wh">🎓 Apply Now</a>
+    <a href="tel:+918010700500" class="btn-ow">📞 8010700500</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-g">
+    <div class="fb">
+      <div class="fb-logo">
+        <div class="flogo-box"><img src="https://www.kccitm.edu.in/images/kcc-logo-new.webp" alt="KCC" onerror="this.parentElement.innerHTML='<span style=font-family:Bebas+Neue;font-size:20px;color:#fff>KCC</span>'"></div>
+        <div><h2>KCC INSTITUTE</h2><span style="font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px">TECHNOLOGY &amp; MANAGEMENT</span></div>
+      </div>
+      <p>Greater Noida's premier destination for engineering, management, law and commerce education. Shaping leaders since 1993.</p>
+      <div class="socs">
+        <a class="soc" href="https://www.facebook.com/kccitm" target="_blank">📘</a>
+        <a class="soc" href="#" target="_blank">📷</a>
+        <a class="soc" href="#" target="_blank">💼</a>
+        <a class="soc" href="#" target="_blank">▶️</a>
+      </div>
+    </div>
+    <div class="fc">
+      <h4>Programs</h4>
+      <a href="https://www.kccitm.edu.in/courses/b-tech/" target="_blank">B.Tech Programs</a>
+      <a href="https://www.kccitm.edu.in/ilhe/ipu-bba" target="_blank">BBA</a>
+      <a href="https://www.kccitm.edu.in/ilhe/ipu-bca" target="_blank">BCA</a>
+      <a href="https://www.kccitm.edu.in/ilhe/ipu-bjmc" target="_blank">BA JMC</a>
+      <a href="https://www.kccitm.edu.in/courses/mba-admissions-greater-noida" target="_blank">MBA Plus</a>
+      <a href="https://www.kccitm.edu.in/courses/m-tech/" target="_blank">M.Tech</a>
+    </div>
+    <div class="fc">
+      <h4>Quick Links</h4>
+      <a href="https://www.kccitm.edu.in/about-us" target="_blank">About KCC</a>
+      <a href="https://www.kccitm.edu.in/admission-process-kccitm" target="_blank">Admissions</a>
+      <a href="https://www.kccitm.edu.in/training-placement/about-placement-cell" target="_blank">Placements</a>
+      <a href="https://www.kccitm.edu.in/infrastructure/academic-block" target="_blank">Infrastructure</a>
+      <a href="https://www.kccitm.edu.in/scholarship/" target="_blank">Scholarships</a>
+      <a href="https://www.kccitm.edu.in/contact" target="_blank">Contact Us</a>
+    </div>
+    <div class="fc">
+      <h4>Contact</h4>
+      <a href="#">📍 Knowledge Park III, Greater Noida, UP 201308</a>
+      <a href="tel:+918010700500">📞 8010700500</a>
+      <a href="mailto:info@kccitm.edu.in">✉️ info@kccitm.edu.in</a>
+      <a href="https://www.kccitm.edu.in" target="_blank">🌐 www.kccitm.edu.in</a>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <p>© 2025 KCC Institute of Technology &amp; Management. All rights reserved.</p>
+    <p><a href="#">Privacy Policy</a> · <a href="#">Anti-Ragging Policy</a></p>
+  </div>
+</footer>
+
+<script>
+// LOADER
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    var loader = document.getElementById('loader');
+    loader.classList.add('hide');
+    setTimeout(function() { loader.style.display = 'none'; }, 800);
+  }, 1900);
+});
+
+// CURSOR
+var cur = document.getElementById('cur');
+var cur2 = document.getElementById('cur2');
+var mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', function(e) {
+  mx = e.clientX; my = e.clientY;
+  cur.style.transform = 'translate(' + (mx-5) + 'px,' + (my-5) + 'px)';
+});
+(function loop() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cur2.style.transform = 'translate(' + (rx-19) + 'px,' + (ry-19) + 'px)';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.pc,.wc,.tc,.ec,.lc').forEach(function(el) {
+  el.addEventListener('mouseenter', function() {
+    cur2.style.width = '58px'; cur2.style.height = '58px';
+    cur2.style.borderColor = '#e8213f';
+  });
+  el.addEventListener('mouseleave', function() {
+    cur2.style.width = '38px'; cur2.style.height = '38px';
+    cur2.style.borderColor = '#c8102e';
+  });
+});
+
+// HERO SLIDESHOW
+var slideIdx = 0;
+var allSlides = document.querySelectorAll('.slide');
+var allDots = document.querySelectorAll('.sdot');
+var slideTimer;
+
+function goSlide(i) {
+  allSlides[slideIdx].classList.remove('on');
+  allDots[slideIdx].classList.remove('on');
+  slideIdx = i;
+  allSlides[slideIdx].classList.add('on');
+  allDots[slideIdx].classList.add('on');
+  clearInterval(slideTimer);
+  slideTimer = setInterval(function() { goSlide((slideIdx + 1) % allSlides.length); }, 5000);
+}
+// Attach to buttons
+document.querySelectorAll('.sdot').forEach(function(btn, i) {
+  btn.onclick = function() { goSlide(i); };
+});
+slideTimer = setInterval(function() { goSlide((slideIdx + 1) % allSlides.length); }, 5000);
+
+// SCROLL REVEAL
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('v');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.sr,.sl,.sr2,.sg').forEach(function(el) { observer.observe(el); });
+
+// COUNTER
+function animCounter(el, target) {
+  var current = 0;
+  var step = Math.max(1, Math.floor(target / 65));
+  var iv = setInterval(function() {
+    current = Math.min(current + step, target);
+    el.textContent = current.toLocaleString();
+    if (current >= target) clearInterval(iv);
+  }, 18);
+}
+var cobs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      animCounter(e.target, parseInt(e.target.getAttribute('data-c')));
+      cobs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-c]').forEach(function(el) { cobs.observe(el); });
+
+// PROGRAMS FILTER
+function filterP(cat, btn) {
+  document.querySelectorAll('.ptab').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.querySelectorAll('.pc').forEach(function(c) {
+    if (cat === 'all' || c.getAttribute('data-c') === cat) {
+      c.style.display = '';
+    } else {
+      c.style.display = 'none';
+    }
+  });
+}
+
+// NAVBAR SCROLL
+window.addEventListener('scroll', function() {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var href = a.getAttribute('href');
+    if (href.length > 1) {
+      var target = document.querySelector(href);
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    }
+  });
+});
+</script>
+</body>
+</html>
