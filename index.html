@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: #4f46e5; }
+    input.valid  { border-color: green; }
+    input.error  { border-color: red; }
+
+    .msg {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+    .msg.ok  { color: green; }
+    .msg.err { color: red; }
+
+    .pw-row { display: flex; gap: 8px; }
+    .pw-row input { flex: 1; }
+    .pw-row button {
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #bar-wrap { margin-top: 6px; background: #eee; border-radius: 4px; height: 6px; }
+    #bar { height: 6px; width: 0; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+
+    button[type=submit] {
+      width: 100%;
+      padding: 12px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    button[type=submit]:hover:not(:disabled) { background: #4338ca; }
+    button[type=submit]:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    hr { margin: 28px 0; border: none; border-top: 1px solid #eee; }
+
+    h3 { color: #333; margin-bottom: 12px; }
+
+    .entry {
+      background: #f8f8f8;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #444;
+    }
+    .entry b { color: #4f46e5; }
+    .entry small { color: #999; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>Create Account</h2>
+
+  <div class="field">
+    <label>Full Name</label>
+    <input id="name" type="text" placeholder="Jane Doe">
+    <div class="msg" id="name-msg"></div>
+  </div>
+
+  <div class="field">
+    <label>Email</label>
+    <input id="email" type="email" placeholder="jane@example.com">
+    <div class="msg" id="email-msg"></div>
+  </div>
+
+  <div class="field">
+    <label>Phone</label>
+    <input id="phone" type="tel" placeholder="555-000-0000">
+    <div class="msg" id="phone-msg"></div>
+  </div>
+
+  <div class="field">
+    <label>Password</label>
+    <div class="pw-row">
+      <input id="password" type="password" placeholder="Min 8 characters">
+      <button type="button" id="toggle">Show</button>
+    </div>
+    <div id="bar-wrap"><div id="bar"></div></div>
+    <div class="msg" id="pw-msg"></div>
+  </div>
+
+  <button type="submit" id="submit" disabled>Register</button>
+
+  <hr>
+  <h3>Submissions</h3>
+  <div id="log"></div>
+</div>
+
+<script>
+  const ok = { name:false, email:false, phone:false, password:false };
+
+  function msg(id, text, isOk) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + (text ? (isOk ? 'ok' : 'err') : '');
+  }
+
+  function setInput(id, state) {
+    const el = document.getElementById(id);
+    el.className = state || '';
+  }
+
+  function checkSubmit() {
+    document.getElementById('submit').disabled = !Object.values(ok).every(Boolean);
+  }
+
+  document.getElementById('name').oninput = function() {
+    const v = this.value.trim();
+    if (v.length >= 2) { msg('name-msg','✓ Looks good!', true); setInput('name','valid'); ok.name = true; }
+    else { msg('name-msg', v ? 'Name too short' : '', false); setInput('name', v ? 'error' : ''); ok.name = false; }
+    checkSubmit();
+  };
+
+  document.getElementById('email').oninput = function() {
+    const v = this.value.trim();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+    if (valid) { msg('email-msg','✓ Valid email', true); setInput('email','valid'); ok.email = true; }
+    else { msg('email-msg', v ? 'Enter a valid email' : '', false); setInput('email', v ? 'error' : ''); ok.email = false; }
+    checkSubmit();
+  };
+
+  document.getElementById('phone').oninput = function() {
+    const digits = this.value.replace(/\D/g,'');
+    if (digits.length >= 7) { msg('phone-msg','✓ Valid', true); setInput('phone','valid'); ok.phone = true; }
+    else { msg('phone-msg', this.value ? 'Too short' : '', false); setInput('phone', this.value ? 'error' : ''); ok.phone = false; }
+    checkSubmit();
+  };
+
+  document.getElementById('password').oninput = function() {
+    const v = this.value;
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+
+    const colors = ['','#ef4444','#f97316','#eab308','#22c55e'];
+    const labels = ['','Weak','Fair','Good','Strong'];
+    document.getElementById('bar').style.width = (score * 25) + '%';
+    document.getElementById('bar').style.background = colors[score] || '#eee';
+
+    if (v.length < 8) { msg('pw-msg', v ? 'Min 8 characters' : '', false); setInput('password', v ? 'error' : ''); ok.password = false; }
+    else if (score < 2) { msg('pw-msg','Weak — try adding numbers/symbols', false); setInput('password','error'); ok.password = false; }
+    else { msg('pw-msg','✓ ' + labels[score], true); setInput('password','valid'); ok.password = true; }
+    checkSubmit();
+  };
+
+  document.getElementById('toggle').onclick = function() {
+    const pw = document.getElementById('password');
+    if (pw.type === 'password') { pw.type = 'text'; this.textContent = 'Hide'; }
+    else { pw.type = 'password'; this.textContent = 'Show'; }
+  };
+
+  document.getElementById('submit').onclick = function() {
+    const entry = {
+      name:  document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      date:  new Date().toLocaleString()
+    };
+    const all = JSON.parse(localStorage.getItem('submissions') || '[]');
+    all.push(entry);
+    localStorage.setItem('submissions', JSON.stringify(all));
+
+    ['name','email','phone','password'].forEach(id => { document.getElementById(id).value = ''; setInput(id,''); });
+    ['name-msg','email-msg','phone-msg','pw-msg'].forEach(id => msg(id,''));
+    document.getElementById('bar').style.width = '0';
+    Object.keys(ok).forEach(k => ok[k] = false);
+    checkSubmit();
+    renderLog();
+  };
+
+  function renderLog() {
+    const all = JSON.parse(localStorage.getItem('submissions') || '[]');
+    document.getElementById('log').innerHTML = all.length
+      ? all.slice().reverse().map(e =>
+          `<div class="entry"><b>${e.name}</b> — ${e.email} — ${e.phone}<br><small>${e.date}</small></div>`
+        ).join('')
+      : '<p style="color:#999;font-size:13px">No submissions yet.</p>';
+  }
+
+  renderLog();
+</script>
+</div>
+</body>
+</html>
