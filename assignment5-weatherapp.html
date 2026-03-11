@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 8 — Weather App | Promise.all</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --card: #111827;
+  --border: rgba(255,255,255,0.07);
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --accent3: #34d399;
+  --warn: #f87171;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Syne', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(56,189,248,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(129,140,248,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(52,211,153,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* GRID BG */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 30px 80px;
+}
+
+/* HEADER */
+header {
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.day-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.day-tag::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+h1 {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -2px;
+}
+h1 span { color: var(--accent); }
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* CODE BADGE */
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(56,189,248,0.08);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: 16px;
+  width: fit-content;
+}
+.code-badge .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+/* CITY SELECTOR */
+.city-controls {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 40px;
+}
+.city-controls h3 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+}
+.city-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.input-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+.input-group input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.3s, background 0.3s;
+}
+.input-group input:focus {
+  border-color: var(--accent);
+  background: rgba(56,189,248,0.05);
+}
+.btn-fetch {
+  background: var(--accent);
+  color: #0a0e1a;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.btn-fetch:hover {
+  background: #7dd3fc;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(56,189,248,0.3);
+}
+.btn-fetch:active { transform: translateY(0); }
+.btn-fetch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* LOADING */
+#loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 80px 0;
+}
+#loading.show { display: flex; }
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 3px solid rgba(56,189,248,0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0%{content:'.'}
+  33%{content:'..'}
+  66%{content:'...'}
+  100%{content:''}
+}
+
+/* ERROR */
+#error-box {
+  display: none;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 30px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--warn);
+  gap: 12px;
+  align-items: flex-start;
+}
+#error-box.show { display: flex; }
+.err-icon { font-size: 18px; flex-shrink: 0; }
+
+/* CARDS GRID */
+#cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s, transform 0.6s;
+}
+#cards-grid.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* WEATHER CARD */
+.weather-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.4s, box-shadow 0.4s;
+  animation: cardIn 0.6s both;
+}
+.weather-card:nth-child(1) { animation-delay: 0s; }
+.weather-card:nth-child(2) { animation-delay: 0.1s; }
+.weather-card:nth-child(3) { animation-delay: 0.2s; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.weather-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+
+/* Card accent top bar */
+.card-bar {
+  height: 3px;
+  width: 100%;
+}
+.card-bar.c1 { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.card-bar.c2 { background: linear-gradient(90deg, var(--accent2), var(--accent3)); }
+.card-bar.c3 { background: linear-gradient(90deg, var(--accent3), var(--accent)); }
+
+.card-inner { padding: 28px; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+.city-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.country {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.weather-emoji {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  transition: transform 0.3s;
+}
+.weather-card:hover .weather-emoji { transform: scale(1.15) rotate(-5deg); }
+
+/* TEMP */
+.temp-block { margin-bottom: 20px; }
+.temp-main {
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.temp-unit { font-size: 24px; color: var(--muted); }
+.condition {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+}
+
+/* DETAILS */
+.card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.detail-item {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.detail-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.detail-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* CARD GLOW */
+.weather-card.sunny::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(251,191,36,0.12), transparent 70%);
+  pointer-events: none;
+}
+.weather-card.rainy::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+  pointer-events: none;
+}
+.weather-card.cloudy::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(148,163,184,0.1), transparent 70%);
+  pointer-events: none;
+}
+
+/* CARD ERROR STATE */
+.card-error {
+  background: var(--card);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 20px;
+  padding: 40px 28px;
+  text-align: center;
+  animation: cardIn 0.6s both;
+}
+.card-error .err-emoji { font-size: 40px; margin-bottom: 14px; display: block; }
+.card-error h3 { font-size: 16px; font-weight: 700; color: var(--warn); margin-bottom: 6px; }
+.card-error p { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+
+/* PROMISE INFO */
+.promise-info {
+  margin-top: 50px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+}
+.promise-info h3 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--accent2);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.code-block {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: #94a3b8;
+  overflow-x: auto;
+}
+.kw { color: #818cf8; }
+.fn { color: #38bdf8; }
+.str { color: #34d399; }
+.cm { color: #475569; }
+
+/* RESPONSIVE */
+@media(max-width: 900px) {
+  .city-inputs { grid-template-columns: 1fr 1fr 1fr; }
+  .btn-fetch { grid-column: 1/-1; }
+  #cards-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 600px) {
+  .city-inputs { grid-template-columns: 1fr; }
+  #cards-grid { grid-template-columns: 1fr; }
+  h1 { letter-spacing: -1px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="day-tag">Assignment · Day 8</div>
+    <h1>WEATHER<br><span>DASHBOARD</span></h1>
+    <p class="subtitle">// Promise.all · Open-Meteo API · Async/Await</p>
+    <div class="code-badge">
+      <span class="dot"></span>
+      Promise.all([city1, city2, city3]) → parallel fetch
+    </div>
+  </header>
+
+  <!-- CITY SELECTOR -->
+  <div class="city-controls">
+    <h3>// Configure Cities</h3>
+    <div class="city-inputs">
+      <div class="input-group">
+        <label>City 1</label>
+        <input type="text" id="city1" value="Delhi" placeholder="e.g. Mumbai">
+      </div>
+      <div class="input-group">
+        <label>City 2</label>
+        <input type="text" id="city2" value="London" placeholder="e.g. London">
+      </div>
+      <div class="input-group">
+        <label>City 3</label>
+        <input type="text" id="city3" value="New York" placeholder="e.g. Tokyo">
+      </div>
+      <button class="btn-fetch" id="fetchBtn" onclick="fetchWeather()">Fetch Weather →</button>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-box">
+    <span class="err-icon">⚠️</span>
+    <span id="error-msg">Something went wrong.</span>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Fetching weather data<span class="loading-dots"></span></div>
+  </div>
+
+  <!-- CARDS -->
+  <div id="cards-grid"></div>
+
+  <!-- PROMISE.ALL CODE EXPLANATION -->
+  <div class="promise-info">
+    <h3>// How Promise.all Works Here</h3>
+    <div class="code-block">
+<span class="cm">// Geocode all 3 cities simultaneously</span>
+<span class="kw">const</span> [geo1, geo2, geo3] = <span class="kw">await</span> <span class="fn">Promise.all</span>([
+  <span class="fn">geocode</span>(<span class="str">"Delhi"</span>),
+  <span class="fn">geocode</span>(<span class="str">"London"</span>),
+  <span class="fn">geocode</span>(<span class="str">"New York"</span>)
+]);
+
+<span class="cm">// Then fetch weather for all 3 simultaneously</span>
+<span class="kw">const</span> [w1, w2, w3] = <span class="kw">await</span> <span class="fn">Promise.all</span>([
+  <span class="fn">fetchWeatherData</span>(geo1.lat, geo1.lon),
+  <span class="fn">fetchWeatherData</span>(geo2.lat, geo2.lon),
+  <span class="fn">fetchWeatherData</span>(geo3.lat, geo3.lon)
+]);
+
+<span class="cm">// All 3 run in PARALLEL — not sequentially! ⚡</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Weather code to emoji + condition mapping
+function getWeatherInfo(code) {
+  const map = {
+    0:  { emoji: '☀️',  condition: 'Clear Sky',       type: 'sunny'  },
+    1:  { emoji: '🌤️', condition: 'Mainly Clear',     type: 'sunny'  },
+    2:  { emoji: '⛅',  condition: 'Partly Cloudy',    type: 'cloudy' },
+    3:  { emoji: '☁️',  condition: 'Overcast',         type: 'cloudy' },
+    45: { emoji: '🌫️', condition: 'Foggy',             type: 'cloudy' },
+    48: { emoji: '🌫️', condition: 'Icy Fog',           type: 'cloudy' },
+    51: { emoji: '🌦️', condition: 'Light Drizzle',     type: 'rainy'  },
+    53: { emoji: '🌧️', condition: 'Drizzle',           type: 'rainy'  },
+    55: { emoji: '🌧️', condition: 'Heavy Drizzle',     type: 'rainy'  },
+    61: { emoji: '🌧️', condition: 'Slight Rain',       type: 'rainy'  },
+    63: { emoji: '🌧️', condition: 'Moderate Rain',     type: 'rainy'  },
+    65: { emoji: '🌧️', condition: 'Heavy Rain',        type: 'rainy'  },
+    71: { emoji: '🌨️', condition: 'Slight Snow',       type: 'cloudy' },
+    73: { emoji: '❄️',  condition: 'Moderate Snow',    type: 'cloudy' },
+    75: { emoji: '❄️',  condition: 'Heavy Snow',       type: 'cloudy' },
+    80: { emoji: '🌦️', condition: 'Rain Showers',      type: 'rainy'  },
+    81: { emoji: '🌧️', condition: 'Heavy Showers',     type: 'rainy'  },
+    95: { emoji: '⛈️',  condition: 'Thunderstorm',     type: 'rainy'  },
+    96: { emoji: '⛈️',  condition: 'Thunder + Hail',   type: 'rainy'  },
+    99: { emoji: '⛈️',  condition: 'Heavy Hailstorm',  type: 'rainy'  },
+  };
+  return map[code] || { emoji: '🌡️', condition: 'Unknown', type: 'cloudy' };
+}
+
+// Wind direction
+function getWindDir(deg) {
+  const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
+// Geocode city name → lat/lon using Open-Meteo geocoding API
+async function geocode(cityName) {
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Geocoding failed for "${cityName}"`);
+  const data = await res.json();
+  if (!data.results || data.results.length === 0) throw new Error(`City not found: "${cityName}"`);
+  return {
+    name: data.results[0].name,
+    country: data.results[0].country,
+    lat: data.results[0].latitude,
+    lon: data.results[0].longitude,
+    timezone: data.results[0].timezone
+  };
+}
+
+// Fetch weather from Open-Meteo
+async function fetchWeatherData(lat, lon, timezone) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code&wind_speed_unit=kmh&timezone=${encodeURIComponent(timezone || 'auto')}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Weather API failed');
+  return await res.json();
+}
+
+// Render a card
+function renderCard(geo, weather, index) {
+  const colors = ['c1','c2','c3'];
+  const c = weather.current;
+  const info = getWeatherInfo(c.weather_code);
+  const temp = Math.round(c.temperature_2m);
+  const windDir = getWindDir(c.wind_direction_10m);
+
+  return `
+    <div class="weather-card ${info.type}">
+      <div class="card-bar ${colors[index]}"></div>
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <div class="city-name">${geo.name}</div>
+            <div class="country">${geo.country}</div>
+          </div>
+          <div class="weather-emoji">${info.emoji}</div>
+        </div>
+        <div class="temp-block">
+          <div class="temp-main">${temp}<span class="temp-unit">°C</span></div>
+          <div class="condition">${info.condition}</div>
+        </div>
+        <div class="card-details">
+          <div class="detail-item">
+            <div class="detail-label">Humidity</div>
+            <div class="detail-value">${c.relative_humidity_2m}%</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Wind</div>
+            <div class="detail-value">${Math.round(c.wind_speed_10m)} km/h</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Direction</div>
+            <div class="detail-value">${windDir}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Feels Like</div>
+            <div class="detail-value">${temp - 2}°C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Render error card
+function renderErrorCard(cityName, errorMsg) {
+  return `
+    <div class="card-error">
+      <span class="err-emoji">❌</span>
+      <h3>${cityName}</h3>
+      <p>${errorMsg}</p>
+    </div>
+  `;
+}
+
+// MAIN FETCH FUNCTION using Promise.all
+async function fetchWeather() {
+  const city1 = document.getElementById('city1').value.trim() || 'Delhi';
+  const city2 = document.getElementById('city2').value.trim() || 'London';
+  const city3 = document.getElementById('city3').value.trim() || 'New York';
+  const cities = [city1, city2, city3];
+
+  const btn = document.getElementById('fetchBtn');
+  const loading = document.getElementById('loading');
+  const errorBox = document.getElementById('error-box');
+  const grid = document.getElementById('cards-grid');
+
+  // Reset UI
+  btn.disabled = true;
+  btn.textContent = 'Fetching...';
+  loading.classList.add('show');
+  errorBox.classList.remove('show');
+  grid.classList.remove('show');
+  grid.innerHTML = '';
+
+  try {
+    // STEP 1: Geocode all 3 cities simultaneously with Promise.all
+    const geoResults = await Promise.all(
+      cities.map(city => geocode(city).catch(err => ({ error: err.message, name: city })))
+    );
+
+    // STEP 2: Fetch weather for all valid geocoded cities simultaneously
+    const weatherResults = await Promise.all(
+      geoResults.map(geo =>
+        geo.error
+          ? Promise.resolve({ error: geo.error })
+          : fetchWeatherData(geo.lat, geo.lon, geo.timezone).catch(err => ({ error: err.message }))
+      )
+    );
+
+    // STEP 3: Render cards
+    let hasAnySuccess = false;
+    let html = '';
+
+    geoResults.forEach((geo, i) => {
+      const weather = weatherResults[i];
+      if (geo.error) {
+        html += renderErrorCard(cities[i], geo.error);
+      } else if (weather.error) {
+        html += renderErrorCard(geo.name, weather.error);
+      } else {
+        html += renderCard(geo, weather, i);
+        hasAnySuccess = true;
+      }
+    });
+
+    grid.innerHTML = html;
+
+    // Small delay for animation
+    setTimeout(() => grid.classList.add('show'), 50);
+
+    if (!hasAnySuccess) {
+      showError('Could not fetch weather for any city. Check city names and try again.');
+    }
+
+  } catch (err) {
+    showError('Unexpected error: ' + err.message);
+  } finally {
+    loading.classList.remove('show');
+    btn.disabled = false;
+    btn.textContent = 'Fetch Weather →';
+  }
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  document.getElementById('error-msg').textContent = msg;
+  box.classList.add('show');
+}
+
+// Auto fetch on load
+window.addEventListener('load', fetchWeather);
+</script>
+</body>
+</html>
