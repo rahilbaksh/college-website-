@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Mode Toggle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root[data-theme="light"] {
+      --bg: #f0ece3;
+      --surface: #faf8f4;
+      --border: #c8c1b4;
+      --text: #1a1714;
+      --text-muted: #7a7468;
+      --accent: #d45c2a;
+      --toggle-bg: #c8c1b4;
+      --toggle-knob: #faf8f4;
+      --shadow: rgba(26,23,20,0.12);
+      --glow: rgba(212,92,42,0);
+    }
+    :root[data-theme="dark"] {
+      --bg: #111009;
+      --surface: #242118;
+      --border: #3a3730;
+      --text: #f0ece3;
+      --text-muted: #888070;
+      --accent: #f07840;
+      --toggle-bg: #f07840;
+      --toggle-knob: #111009;
+      --shadow: rgba(0,0,0,0.5);
+      --glow: rgba(240,120,64,0.3);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: 'Syne', sans-serif; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.5s, color 0.5s;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.25;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      padding: 56px 64px;
+      text-align: center;
+      box-shadow: 6px 6px 0 var(--border), 0 24px 64px var(--shadow);
+      transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
+      min-width: 380px;
+      z-index: 1;
+    }
+
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: var(--accent); border-style: solid;
+      transition: border-color 0.5s;
+    }
+    .card::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+    .card::after  { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+
+    .label-top {
+      font-family: 'Syne Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      transition: color 0.5s;
+    }
+
+    .icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 40px;
+    }
+
+    .icon {
+      font-size: 32px;
+      opacity: 0.35;
+      transition: opacity 0.4s, transform 0.4s;
+      user-select: none;
+    }
+    [data-theme="light"] .icon.sun  { opacity: 1; transform: scale(1.2) rotate(-15deg); }
+    [data-theme="dark"]  .icon.moon { opacity: 1; transform: scale(1.2) rotate(15deg); }
+
+    .toggle-wrap { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+    .toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      width: 80px; height: 40px;
+      background: var(--toggle-bg);
+      border-radius: 40px;
+      border: 2px solid var(--border);
+      position: relative;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+    }
+    [data-theme="dark"] .toggle-track { box-shadow: 0 0 20px 4px var(--glow); }
+
+    .toggle-knob {
+      position: absolute;
+      top: 4px; left: 4px;
+      width: 28px; height: 28px;
+      background: var(--toggle-knob);
+      border-radius: 50%;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s;
+    }
+    [data-theme="dark"] .toggle-knob { transform: translateX(40px); }
+    .toggle-wrap:hover .toggle-track { filter: brightness(1.08); }
+
+    .heading {
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      transition: color 0.5s;
+    }
+
+    .subtext {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'Syne Mono', monospace;
+      margin-top: 32px;
+      transition: color 0.5s;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'Syne Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--surface);
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-top: 10px;
+      transition: background 0.5s, color 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="label-top">mini app #01 — theme system</div>
+    <div class="icon-row">
+      <span class="icon sun">☀️</span>
+      <label class="toggle-wrap" aria-label="Toggle dark mode">
+        <input type="checkbox" class="toggle-input" id="toggle" />
+        <div class="toggle-track"><div class="toggle-knob"></div></div>
+      </label>
+      <span class="icon moon">🌙</span>
+    </div>
+    <div class="heading" id="mode-label">Light Mode</div>
+    <div class="subtext">
+      Preference persisted to localStorage<br />
+      <span class="badge">✓ saved</span>
+    </div>
+  </div>
+
+  <script>
+    const html   = document.documentElement;
+    const toggle = document.getElementById('toggle');
+    const label  = document.getElementById('mode-label');
+    const KEY    = 'dark-mode-toggle__theme';
+
+    function applyTheme(dark, save = true) {
+      html.dataset.theme   = dark ? 'dark' : 'light';
+      toggle.checked       = dark;
+      label.textContent    = dark ? 'Dark Mode' : 'Light Mode';
+      if (save) localStorage.setItem(KEY, dark ? 'dark' : 'light');
+    }
+
+    const stored = localStorage.getItem(KEY);
+    if (stored) {
+      applyTheme(stored === 'dark', false);
+    } else {
+      applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches, false);
+    }
+
+    toggle.addEventListener('change', () => applyTheme(toggle.checked));
+  </script>
+</body>
+</html>
